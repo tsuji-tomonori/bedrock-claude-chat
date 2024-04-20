@@ -2,6 +2,7 @@ Resources:
   ProjectRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: bedrock-claude-chat-build
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
@@ -15,6 +16,11 @@ Resources:
             - - "arn:"
               - Ref: AWS::Partition
               - :iam::aws:policy/AdministratorAccess
+      Tags:
+        - Key: project
+          Value: bedrock-claude-chat
+        - Key: managedBy
+          Value: cfn
   ProjectRoleDefaultPolicy:
     Type: AWS::IAM::Policy
     Properties:
@@ -73,6 +79,7 @@ Resources:
   Project:
     Type: AWS::CodeBuild::Project
     Properties:
+      Name: bedrock-claude-chat-build
       Artifacts:
         Type: NO_ARTIFACTS
       Cache:
@@ -104,16 +111,21 @@ Resources:
               },
               "build": {
                 "commands": [
-                  "git clone https://github.com/aws-samples/bedrock-claude-chat.git",
+                  "git clone https://github.com/tsuji-tomonori/bedrock-claude-chat.git",
                   "cd bedrock-claude-chat/cdk",
                   "npm ci",
-                  "cdk bootstrap",
-                  "cdk deploy --require-approval never --all"
+                  "cdk synth > template.yaml",
+                  "aws s3 cp template.yaml s3://s3s-tsuji-work/bedrock-claude-chat/"
                 ]
               }
             }
           }
         Type: NO_SOURCE
+      Tags:
+        - Key: project
+          Value: bedrock-claude-chat
+        - Key: managedBy
+          Value: cfn
 Outputs:
   ProjectName:
     Value:
