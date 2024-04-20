@@ -5,7 +5,7 @@ StackName="CodeBuildForDeploy"
 stackId=$(aws cloudformation create-stack \
   --stack-name $StackName \
   --template-body file://deploy.yml \
-  --capabilities CAPABILITY_IAM \
+  --capabilities CAPABILITY_NAMED_IAM \
   --query 'StackId' --output text)
 
 echo "Waiting for the stack creation to complete..."
